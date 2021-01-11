@@ -1,3 +1,17 @@
+# Fork of Monocular Total Capture for "Contacts and Human Dynamics from Monocular Video"
+
+The original README is below with dependencies and installation instructions. These must be followed in order to run this code as part of the contacts and human dynamics pipeline.
+
+For installation, it is helpful to look at the provided [docker file](Dockerfile). A few other installation tips:
+* In order to use the required version of OpenCV with CUDA 9.0, you need to patch the source with the changed specified [in this repository](https://github.com/davidstutz/opencv-2.4-cuda-9-patch).
+* Build Caffe from source rather than along with OpenPose
+
+## Notable Changes from the Original Repo
+* New [program to visualize total capture results](./FitAdam/viz_results.cpp).
+* New [program to process total capture results](./FitAdam/process_results.cpp) and write them out to be used in the contacts and human dynamics pipeline.
+
+==================================================================================================================
+
 # Monocular Total Capture
 Code for CVPR19 paper "Monocular Total Capture: Posing Face, Body and Hands in the Wild"
 
