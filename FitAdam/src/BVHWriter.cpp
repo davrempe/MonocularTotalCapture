@@ -144,18 +144,17 @@ void BVHWriter::getDynamic(Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eige
 	Eigen::Matrix<double, 3, 3, Eigen::RowMajor> R;
 	std::array<double, 3> angle;
 	ceres::AngleAxisToRotationMatrix(pose.data() + 3 * idj, R.data());
-	// Eigen::Matrix<double, 3, 3, Eigen::RowMajor> RT;
-	// RT << R.transpose();
-	RotationMatrixToEulerAngle(R, angle);
+	Eigen::Matrix<double, 3, 3, Eigen::RowMajor> RT;
+	RT << R.transpose();
+	RotationMatrixToEulerAngle(RT, angle);
 	this->root->euler.push_back(angle);
 
 	for (idj = 1; idj < TotalModel::NUM_JOINTS; idj++)
 	{
-		ceres::AngleAxisToRotationMatrix(pose.data() + 3 * idj, R.data());
-		// ceres::EulerAnglesToRotationMatrix(pose.data() + 3 * idj, 3, R.data());
-		// RT << R.transpose();
+		ceres::EulerAnglesToRotationMatrix(pose.data() + 3 * idj, 3, R.data());
+		RT << R.transpose();
 		std::array<double, 3> angle;
-		RotationMatrixToEulerAngle(R, angle);
+		RotationMatrixToEulerAngle(RT, angle);
 		this->data[idj]->euler.push_back(angle);
 	}
 }
