@@ -3,8 +3,10 @@
 The original README is below with dependencies and installation instructions. These must be followed in order to run this code as part of the contacts and human dynamics pipeline.
 
 For installation, it is helpful to look at the provided [docker file](https://github.com/CMU-Perceptual-Computing-Lab/MonocularTotalCapture/blob/master/Dockerfile). A few other installation tips:
+* In addition to setting the correct openpose path in `run_pipeline.sh` also change it in `run_pipeline_no_ffmpeg.sh`
 * In order to use the required version of OpenCV with CUDA 9.0, you need to patch the source with the changed specified [in this repository](https://github.com/davidstutz/opencv-2.4-cuda-9-patch).
-* Build Caffe from source rather than along with OpenPose
+* Build Caffe from source rather than along with OpenPose to avoid later errors
+* If you run into glew errors when linking during building MTC, try changing `${GLEW_LIBRARY}` to `${GLEW_LIBRARIES}` in the `CMakesLists.txt` file.
 
 ## Notable Changes from the Original Repo
 * New [program to visualize total capture results](./FitAdam/viz_results.cpp).
@@ -15,14 +17,16 @@ For installation, it is helpful to look at the provided [docker file](https://gi
 # Monocular Total Capture
 Code for CVPR19 paper "Monocular Total Capture: Posing Face, Body and Hands in the Wild"
 
+![Teaser Image](https://xiangdonglai.github.io/MTC_teaser.jpg)
+
 Project website: [<http://domedb.perception.cs.cmu.edu/mtc.html>]
 
 # Dependencies
 This code is tested on a Ubuntu 16.04 machine with a GTX 1080Ti GPU, with the following dependencies.
 1. ffmpeg
-2. Python 3.5 (with TensorFlow 1.5.0, OpenCV, Matplotlib)
+2. Python 3.5 (with TensorFlow 1.5.0, OpenCV, Matplotlib, packages installed with pip3)
 3. cmake >= 2.8
-4. OpenCV 2.4.13 (compiled with CUDA)
+4. OpenCV 2.4.13 (compiled from source with CUDA 9.0, CUDNN 7.0)
 5. Ceres-Solver 1.13.0 (with SuiteSparse)
 6. OpenGL, GLUT, GLEW
 7. libigl <https://github.com/libigl/libigl>
@@ -42,7 +46,7 @@ This code is tested on a Ubuntu 16.04 machine with a GTX 1080Ti GPU, with the fo
 
 # Usage
 1. Suppose the video to be tested is named "${seqName}.mp4". Place it in "${ROOT}/${seqName}/${seqName}.mp4".
-2. If the camera intrinsics is known, put it in "${ROOT}/${seqName}/calib.json" (refer to "POF/calib.json" for example).
+2. If the camera intrinsics is known, put it in "${ROOT}/${seqName}/calib.json" (refer to "POF/calib.json" for example); otherwise, a default camera intrinsics will be used.
 3. In ${ROOT}, run "bash run_pipeline.sh ${seqName}"; if the subject in the video shows only upper body, run "bash run_pipeline.sh ${seqName} -f".
 
 # Examples
@@ -55,4 +59,34 @@ or
 bash run_pipeline.sh example_speech -f
 ```
 
-Note: Facial expression of Adam model is unavailable to copyright issue.
+# License and Citation
+This code can only be used for **non-commercial research purposes**. If you use this code in your research, please cite the following papers.
+```
+@inproceedings{xiang2019monocular,
+  title={Monocular total capture: Posing face, body, and hands in the wild},
+  author={Xiang, Donglai and Joo, Hanbyul and Sheikh, Yaser},
+  booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  year={2019}
+}
+
+@inproceedings{joo2018total,
+  title={Total capture: A 3d deformation model for tracking faces, hands, and bodies},
+  author={Joo, Hanbyul and Simon, Tomas and Sheikh, Yaser},
+  booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  year={2018}
+}
+```
+
+Some part of this code is modified from [lmb-freiburg/hand3d](https://github.com/lmb-freiburg/hand3d).
+
+# Adam Model
+We use the deformable human model [**Adam**](http://www.cs.cmu.edu/~hanbyulj/totalcapture/) in this code.
+
+**The relationship between Adam and SMPL:** The body part of Adam is derived from [SMPL](http://smpl.is.tue.mpg.de/license_body) model by Loper et al. 2015. It follows SMPL's body joint hierarchy, but uses a different joint regressor. Adam does not contain the original SMPL model's shape and pose blendshapes, but uses its own version trained from Panoptic Studio database.
+
+**The relationship between Adam and FaceWarehouse:** The face part of Adam is derived from [FaceWarehouse](http://kunzhou.net/zjugaps/facewarehouse/). In particular, the mesh topology of face of Adam is a modified version of the learned model from FaceWarehouse dataset. Adam does not contain the blendshapes of the original FaceWarehouse data, and facial expression of Adam model is unavailable due to copyright issues.
+
+The Adam model is shared for research purpose only, and cannot be used for commercial purpose. Redistributing the original or modified version of Adam is also not allowed without permissions. 
+
+# Special Notice
+1. In our code, the output of ceres::AngleAxisToRotationMatrix is always a RowMajor matrix, while the function is designed for a ColMajor matrix. To account for this, please treat our output pose parameters as the opposite value. In other words, before exporting our pose parameter to other softwares, please multiply them by -1.
