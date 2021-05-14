@@ -2,7 +2,7 @@
 
 The original README is below with dependencies and installation instructions. These must be followed in order to run this code as part of the contacts and human dynamics pipeline.
 
-For installation, it is helpful to look at the provided [docker file](https://github.com/CMU-Perceptual-Computing-Lab/MonocularTotalCapture/blob/master/Dockerfile). A few other installation tips:
+For installation, it is helpful to look at the provided [docker file](https://github.com/CMU-Perceptual-Computing-Lab/MonocularTotalCapture/blob/master/Dockerfile) from the original repo (note this docker file is **not** for this fork, only the original repo). A few other installation tips:
 * In addition to setting the correct openpose path in `run_pipeline.sh` also change it in `run_pipeline_no_ffmpeg.sh`
 * In order to use the required version of OpenCV with CUDA 9.0, you need to patch the source with the changed specified [in this repository](https://github.com/davidstutz/opencv-2.4-cuda-9-patch).
 * Build Caffe from source rather than along with OpenPose to avoid later errors
